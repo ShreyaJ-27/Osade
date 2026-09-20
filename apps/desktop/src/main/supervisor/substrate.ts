@@ -60,14 +60,25 @@ export function runtimeEnv(session = OSADE_SESSION): Record<string, string> {
  * The daemon gets the prefix through codegen; this process cannot import that, so it reads the
  * record itself — shipped beside the runtime in a packaged app, in `vendor/runtime/<pin>/` in a
  * checkout.
+ *
+ * The prefix comes from `binary.env_prefix`, which describes the pinned *binary's* input
+ * contract. It is deliberately NOT derived from `license.upstream_repository`: that field carries
+ * Osade's rebranded identity, while the shipped executable still reads its original variable
+ * names. Deriving one from the other spawns a runtime that ignores every socket override below,
+ * listens somewhere else, and fails the boot ping with no diagnostic.
  */
 export function runtimeVariable(name: string): string {
-  const segments = new URL(runtimePin().license.upstream_repository).pathname.split('/').filter(Boolean);
-  return `${(segments[segments.length - 1] ?? '').toUpperCase()}_${name}`;
+  const prefix = runtimePin().binary?.env_prefix;
+  if (typeof prefix !== 'string' || !/^[A-Z][A-Z0-9_]*$/.test(prefix)) {
+    throw new Error(
+      `the runtime's pin.json has no usable binary.env_prefix (got ${JSON.stringify(prefix)})`,
+    );
+  }
+  return `${prefix}_${name}`;
 }
 
 interface RuntimePin {
-  license: { upstream_repository: string };
+  binary?: { env_prefix?: string };
 }
 
 let loadedPin: RuntimePin | null = null;

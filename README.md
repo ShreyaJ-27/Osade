@@ -127,6 +127,7 @@ Early and moving fast. Usable, not stable.
 
 |                                    |                                                              |
 | ---------------------------------- | ------------------------------------------------------------ |
+| [docs/architechture.md](docs/architechture.md) | How it is built — processes, boundaries, invariants, in depth |
 | [docs/OSADE.md](docs/OSADE.md)     | Full spec — architecture, data model, invariants, milestones |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to work on Osade                                         |
 

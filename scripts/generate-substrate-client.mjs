@@ -78,6 +78,24 @@ function projectName(pin) {
   return segments[segments.length - 1];
 }
 
+/**
+ * The prefix of the runtime's own environment variables, as the pin records it.
+ *
+ * This is the pinned *binary's* input contract, so it is read from `binary.env_prefix` and is
+ * deliberately NOT derived from `license.upstream_repository`: that field carries Osade's
+ * rebranded identity, while the shipped executable still reads its original names. Deriving one
+ * from the other spawns a runtime that silently ignores every socket override it is handed.
+ */
+function envPrefix(pin) {
+  const prefix = pin.binary?.env_prefix;
+  if (typeof prefix !== 'string' || !/^[A-Z][A-Z0-9_]*$/.test(prefix)) {
+    throw new Error(
+      `pin.json: binary.env_prefix must be an uppercase identifier, got ${JSON.stringify(prefix)}`,
+    );
+  }
+  return prefix;
+}
+
 function osadeNames(ts, pin) {
   const segments = new URL(pin.license.upstream_repository).pathname.split('/').filter(Boolean);
   const project = segments[segments.length - 1];
@@ -212,7 +230,7 @@ export const SUBSTRATE_PIN = Object.freeze({
   schemaVersion: ${pin.substrate.schema_version},
   methodCount: ${methods.length},
   /** The prefix of the runtime's own environment variables, e.g. \`<prefix>_SOCKET_PATH\`. */
-  envPrefix: ${JSON.stringify(projectName(pin).toUpperCase())},
+  envPrefix: ${JSON.stringify(envPrefix(pin))},
 });
 `;
 

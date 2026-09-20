@@ -28,6 +28,8 @@
   "binary": {
     "$comment": "Release assets for v0.8.2, hashed from what GitHub actually serves. NOT committed - ~91 MB of binaries do not belong in git. `node scripts/fetch-substrate-binaries.mjs` downloads and verifies against these. CONFIRMED 2026-09-11: the Windows binary inside the zip hashes to the value the schema was captured from, so the pinned schema comes from the genuine release build - while backend/ source is AHEAD of v0.8.2 (ADR 0002). Binary and source are pinned to different things, deliberately and now provably. `{project}` in asset names is filled by the fetch script; after verify the file is renamed to osade-runtime.",
     "vendored": false,
+    "$comment_env_prefix": "The prefix of the environment variables the pinned executable reads (<prefix>_SOCKET_PATH, <prefix>_SESSION, <prefix>_STARTUP_CWD...). This is the BINARY's input contract and must never be derived from license.upstream_repository: that field carries Osade's rebranded identity, while the shipped release binary still reads its original names. Confirmed 2026-09-20 by scanning the pinned Windows executable: it contains HERDR_* names and zero OSADE_* names. Deriving this from the repository URL makes the supervisor pass overrides the runtime ignores, so it listens elsewhere and boot fails the ping with no diagnostic.",
+    "env_prefix": "HERDR",
     "release_tag": "v0.8.2",
     "expected_layout": "vendor/runtime/<version>-p<protocol>/<target>/osade-runtime[.exe]",
     "assets": {
